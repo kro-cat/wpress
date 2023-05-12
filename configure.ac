@@ -23,7 +23,7 @@
 #  
 
 AC_PREREQ([2.69])
-AC_INIT([skel], [0.1.0], [bugs@kara-online.net], [skel], [https://github.com/Kara1147/autoconf-skel])
+AC_INIT([wpress], [0.1.0], [bugs@kara-online.net], [skel], [https://github.com/kro-cat/wpress.git])
 
 m4_include([m4/ax_valgrind_check.m4])
 
@@ -60,19 +60,22 @@ AM_INIT_AUTOMAKE([subdir-objects])
 WARN_CFLAGS="-W -Wall -Wunused -Werror"
 AC_SUBST(WARN_CFLAGS)
 AC_CONFIG_MACRO_DIRS([m4])
-#AC_CONFIG_SUBDIRS([include/krossock])
+AC_CONFIG_SUBDIRS([include/lib-mmap])
 AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_HEADERS([config.h])
 AX_VALGRIND_DFLT([memcheck], [on])
 AX_VALGRIND_CHECK
 
 #program config
+AC_PROG_CC
 
 #headers
 
 #types
 
 #functions
+AC_CHECK_FUNCS([strchr])
+AC_CHECK_HEADERS([unistd.h])
 
 #makefiles
 AC_CONFIG_FILES([

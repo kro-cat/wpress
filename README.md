@@ -1,12 +1,10 @@
-# autoconf-skel
-autoconf skeleton for my projects
+# wpress
+Wpress archive tool
 
 ## Usage
+decompress
 ```bash
-git clone https://github.com/Kara1147/autoconf-skel.git myrepo-name
-cd myrepo-name
-rm -rf .git
-git init
+$ wpress -x FILE
 ```
 
 ## Library requirements

@@ -1,1 +1,1 @@
-#SUBDIRS = krossock
+SUBDIRS = lib-mmap

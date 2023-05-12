@@ -1,5 +1,5 @@
 AC_PREREQ([2.71])
-AC_INIT([libmmap], [0.5], [bugs@kara-online.net])
+AC_INIT([libfbuf], [0.5], [bugs@kara-online.net])
 
 #host switch
 AC_CANONICAL_HOST

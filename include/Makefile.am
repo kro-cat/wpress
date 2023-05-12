@@ -1,1 +1,1 @@
-SUBDIRS = lib-mmap
+#SUBDIRS = lib-buffer

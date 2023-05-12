@@ -43,24 +43,27 @@ AC_CANONICAL_HOST
 
 AS_CASE(["$host_os"],
   [*linux*], [
-   # OS specific stuff here
+    OS_VERSION=linux
+    AC_DEFINE([OS_LINUX], [], [host_os is linux-based])
   ],
-#  [*mingw*|*cygwin*], [
-#   # OS specific stuff here
-#    AC_DEFINE([WINVER], [_WIN32_WINNT_WIN10],
-#      [Define windows version as WIN10])
-#    AC_DEFINE([_WIN32_WINNT], [_WIN32_WINNT_WIN10],
-#      [Define windows version as WIN10])
-#  ],
+  [*mingw*|*cygwin*], [
+    OS_VERSION=windows
+    AC_DEFINE([OS_LINUX], [], [host_os is windows-based])
+    AC_DEFINE([WINVER], [_WIN32_WINNT_WIN10],
+      [Define windows version as WIN10])
+    AC_DEFINE([_WIN32_WINNT], [_WIN32_WINNT_WIN10],
+      [Define windows version as WIN10])
+  ],
   [AC_MSG_WARN([unsupported system: $host_os])]
 )
+AM_CONDITIONAL([HOST_WINDOWS], [test "x${OS_VERSION}" = "xwindows"])
 
 #autoconf stuff
 AM_INIT_AUTOMAKE([subdir-objects])
 WARN_CFLAGS="-W -Wall -Wunused -Werror"
 AC_SUBST(WARN_CFLAGS)
 AC_CONFIG_MACRO_DIRS([m4])
-AC_CONFIG_SUBDIRS([include/lib-mmap])
+#AC_CONFIG_SUBDIRS([include/lib-buffer])
 AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_HEADERS([config.h])
 AX_VALGRIND_DFLT([memcheck], [on])
@@ -70,18 +73,23 @@ AX_VALGRIND_CHECK
 AC_PROG_CC
 
 #headers
+AC_CHECK_HEADERS([inttypes.h])
+AC_CHECK_HEADERS([unistd.h])
 
 #types
+AC_TYPE_UINT16_T
 
 #functions
+AC_CHECK_FUNCS([mkdir])
 AC_CHECK_FUNCS([strchr])
-AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_FUNCS([strerror])
+AC_FUNC_MALLOC
 
 #makefiles
 AC_CONFIG_FILES([
   Makefile
   src/Makefile
-  tests/Makefile
-  include/Makefile
 ])
+#tests/Makefile
+#include/Makefile
 AC_OUTPUT

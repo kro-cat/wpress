@@ -23,11 +23,12 @@
 #  
 
 # BINARY EXECUTABLE
-AM_CFLAGS = $(WARN_CFLAGS) -I$(top_builddir)/include/lib-mmap/src
+AM_CFLAGS = $(WARN_CFLAGS)
+# -I$(top_builddir)/include/lib-fbuf/src
 bin_PROGRAMS = $(top_builddir)/bin/wpress
 __top_builddir__bin_wpress_SOURCES = main.c
-__top_builddir__bin_wpress_LDFLAGS = -static $(top_builddir)/include/lib-mmap/bin/libmmap.a
-__top_builddir__bin_wpress_LDADD = -lmmap
+#__top_builddir__bin_wpress_LDFLAGS = -static -L$(top_builddir)/include/lib-fbuf/bin
+#__top_builddir__bin_wpress_LDADD = -lfbuf
 
 # LIBRARY
 #noinst_LIBRARIES = $(top_builddir)/bin/library.a

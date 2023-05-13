@@ -49,7 +49,6 @@ AX_VALGRIND_CHECK
 AC_PROG_CC
 
 #headers
-AC_CHECK_HEADERS([inttypes.h])
 AC_CHECK_HEADERS([unistd.h])
 
 #types
@@ -58,6 +57,7 @@ AC_TYPE_SIZE_T
 #functions
 AC_CHECK_FUNCS([mkdir])
 AC_CHECK_FUNCS([strchr])
+AC_CHECK_FUNCS([strcspn])
 AC_CHECK_FUNCS([strerror])
 AC_CHECK_FUNCS([strtoull])
 AC_FUNC_MALLOC

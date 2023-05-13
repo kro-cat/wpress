@@ -7,8 +7,8 @@ decompress
 $ wpress -xf ARCHIVE
 ```
 
-## Library requirements
-*none*
+## Library (non-gcc) requirements
+*none, when using gcc toolchain*
 
 ## Additional Information
 This appliction is set up to be built using autotools. You may use

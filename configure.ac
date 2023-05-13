@@ -1,27 +1,3 @@
-#  
-#  MIT License
-#  
-#  Copyright (c) 2022 Kara
-#  
-#  Permission is hereby granted, free of charge, to any person obtaining a copy
-#  of this software and associated documentation files (the "Software"), to deal
-#  in the Software without restriction, including without limitation the rights
-#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#  copies of the Software, and to permit persons to whom the Software is
-#  furnished to do so, subject to the following conditions:
-#  
-#  The above copyright notice and this permission notice shall be included in all
-#  copies or substantial portions of the Software.
-#  
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#  SOFTWARE.
-#  
-
 AC_PREREQ([2.69])
 AC_INIT([wpress], [0.1.0], [bugs@kara-online.net], [skel], [https://github.com/kro-cat/wpress.git])
 
@@ -77,12 +53,13 @@ AC_CHECK_HEADERS([inttypes.h])
 AC_CHECK_HEADERS([unistd.h])
 
 #types
-AC_TYPE_UINT16_T
+AC_TYPE_SIZE_T
 
 #functions
 AC_CHECK_FUNCS([mkdir])
 AC_CHECK_FUNCS([strchr])
 AC_CHECK_FUNCS([strerror])
+AC_CHECK_FUNCS([strtoull])
 AC_FUNC_MALLOC
 
 #makefiles

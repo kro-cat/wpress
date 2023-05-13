@@ -76,13 +76,18 @@ char *get_fullpath(header_t *phdr)
 			*p = PATH_SEPARATOR;
 
 		// TODO: make each directory in order eg: /usr -> /usr/local
-		if (mkdir(path, 0755)) {
-			if (errno != EEXIST) {
-				free(path);
-				PRINT_ERROR("mkdir(): %s\n", strerror(errno));
-				return NULL;
+		p = strchr(p, PATH_SEPARATOR);
+		do {
+			*p = 0;
+			if (mkdir(path, 0755)) {
+				if (errno != EEXIST) {
+					free(path);
+					PRINT_ERROR("mkdir(): %s\n", strerror(errno));
+					return NULL;
+				}
 			}
-		}
+			*p = PATH_SEPARATOR;
+		} while ((p = strchr(p, PATH_SEPARATOR)));
 
 		p = &(path[strlen(path)]);
 		*(p++) = PATH_SEPARATOR;

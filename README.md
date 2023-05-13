@@ -4,7 +4,7 @@ Wpress archive tool
 ## Usage
 decompress
 ```bash
-$ wpress -x FILE
+$ wpress -xf ARCHIVE
 ```
 
 ## Library requirements

@@ -90,7 +90,7 @@ char *make_fullpath(header_t *phdr, int absolute_names)
 			while ((span = strcspn(p, "\\/"))) {
 				p += span;
 				*p = 0;
-				PRINT_INFO("mkdir(\"%s\")\n", path);
+				//PRINT_DEBUG("mkdir(\"%s\")\n", path);
 				if (mkdir(path, 0755)) {
 					if (errno != EEXIST) {
 						free(path);
@@ -102,6 +102,7 @@ char *make_fullpath(header_t *phdr, int absolute_names)
 				*(p++) = PATH_SEPARATOR;
 			}
 			*p = 0;
+			PRINT_DEBUG("mkdir(\"%s\")\n", path);
 		}
 	}
 

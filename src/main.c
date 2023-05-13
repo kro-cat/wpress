@@ -44,20 +44,24 @@ int is_eof_header(header_t *phdr)
 	return 1;
 }
 
-#define BLOCK_DEFAULT_SIZE 1024
-
-char *get_fullpath(header_t *phdr)
+char *make_fullpath(header_t *phdr, int absolute_names)
 {
 	char *p;
 	char *path;
+	size_t span;
+	size_t prefix_length = PREFIX_SIZE;
+	size_t name_length = NAME_SIZE;
 
 	// TODO: make sure this is portable to other operating systems.
 	//       (it probably isn't)
 	// FIXME: program will break later on if filename (not path)
 	//        has directory separators in it.
 
-	size_t prefix_length = strlen(phdr->prefix);
-	size_t name_length = strlen(phdr->name);
+	if (phdr->prefix[PREFIX_SIZE - 1] == 0)
+		prefix_length = strlen(phdr->prefix);
+	if (phdr->name[NAME_SIZE - 1] == 0)
+		name_length = strlen(phdr->name);
+
 	path = malloc(prefix_length + name_length + 2);
 
 	if (path == NULL) {
@@ -65,39 +69,48 @@ char *get_fullpath(header_t *phdr)
 		return NULL;
 	}
 
-	path[0] = 0;
-
 	if (phdr->prefix[0] != 0) {
-		memcpy(path, phdr->prefix, prefix_length);
+		if (!absolute_names) {
+			if ((phdr->prefix[0] == BAD_PATH_SEPARATOR)
+			    || (phdr->prefix[0] == PATH_SEPARATOR))
+				memcpy(path, phdr->prefix + 1, --prefix_length);
+		} else {
+			memcpy(path, phdr->prefix, prefix_length);
+		}
 
-		/* replace directory separators */
-		p = path;
-		while ((p = strchr(p, BAD_PATH_SEPARATOR)))
-			*p = PATH_SEPARATOR;
+		path[prefix_length] = 0;
+		path[prefix_length + 1] = 0;
 
-		// TODO: make each directory in order eg: /usr -> /usr/local
-		p = strchr(p, PATH_SEPARATOR);
-		do {
-			*p = 0;
-			if (mkdir(path, 0755)) {
-				if (errno != EEXIST) {
-					free(path);
-					PRINT_ERROR("mkdir(): %s\n", strerror(errno));
-					return NULL;
+		PRINT_INFO("mkdir(\"%s\")\n", path);
+
+		if (prefix_length) {
+			/* replace directory separators */
+			// TODO: make each directory in order eg: /usr -> /usr/local
+			p = path;
+			while ((span = strcspn(p, "\\/"))) {
+				p += span;
+				*p = 0;
+				PRINT_INFO("mkdir(\"%s\")\n", path);
+				if (mkdir(path, 0755)) {
+					if (errno != EEXIST) {
+						free(path);
+						PRINT_ERROR("mkdir(): %s\n",
+							    strerror(errno));
+						return NULL;
+					}
 				}
+				*(p++) = PATH_SEPARATOR;
 			}
-			*p = PATH_SEPARATOR;
-		} while ((p = strchr(p, PATH_SEPARATOR)));
-
-		p = &(path[strlen(path)]);
-		*(p++) = PATH_SEPARATOR;
-		*p = 0;
+			*p = 0;
+		}
 	}
 
 	/* append filename to path */
 	strncat(path, phdr->name, name_length);
 	return path;
 }
+
+#define BLOCK_DEFAULT_SIZE 1024
 
 int write_file(FILE *fp_out, size_t size, FILE *fp_in)
 {
@@ -155,7 +168,7 @@ die:
 	return -1;
 }
 
-int wpress_extract(const char *path)
+int wpress_extract(const char *path, int absolute_names)
 {
 	int ret;
 	long unsigned int bytes_read;
@@ -209,7 +222,7 @@ int wpress_extract(const char *path)
 		}
 
 		/* ensure path */
-		if ((outfile_path = get_fullpath(phdr)) == NULL)
+		if ((outfile_path = make_fullpath(phdr, absolute_names)) == NULL)
 			goto die_no_file;
 
 		// TODO: don't overwrite a NEWER file
@@ -256,24 +269,26 @@ Usage: " S(EXECNAME) " [OPTION...]\n\
 Extract all files from a \"wpress\" archive.\n\
 \n\
 Options:\n\
-    -h, --help                         show this message\n\
-    -x, --extract, --get               extract files from an archive\n\
-    -f, --file=ARCHIVE                 use archive file or device ARCHIVE\n");
+  -h, --help                         show this message\n\
+  -x, --extract, --get               extract files from an archive\n\
+  -f, --file=ARCHIVE                 use archive file or device ARCHIVE\n\
+  -P, --absolute-names               don't strip leading '/'s from file names\n");
 }
 
 typedef enum { MODE_DEFAULT=0, MODE_EXTRACT=1 } modes;
 
-int parse_args(int argc, char * const *argv, modes *mode, const char **file)
+int parse_args(int argc, char * const *argv, modes *mode, const char **file, int *absolute_names)
 {
 	int opt;
 	char *sp;
 
-	const char *optstring = "hxf:";
+	const char *optstring = "hxf:P";
 	const struct option longopts[] = {
 		{ "help", no_argument, NULL, 'h' },
 		{ "file", required_argument, NULL, 'f' },
 		{ "extract", no_argument, NULL, 'x' },
 		{ "get", no_argument, NULL, 'x' },
+		{ "absolute-names", no_argument, NULL, 'P' },
 		{ 0, 0, NULL, 0 }
 	};
 
@@ -295,6 +310,9 @@ int parse_args(int argc, char * const *argv, modes *mode, const char **file)
 		case 'x':
 			// Extract
 			*mode = MODE_EXTRACT;
+			break;
+		case 'P':
+			*absolute_names = 1;
 			break;
 		case '?':
 			__attribute__((fallthrough));
@@ -333,8 +351,9 @@ int main(int argc, char * const *argv)
 	int ret = 0;
 	modes mode = MODE_DEFAULT;
 	const char *file = "-";
+	int absolute_names = 0;
 
-	if ((ret = parse_args(argc, argv, &mode, &file)))
+	if ((ret = parse_args(argc, argv, &mode, &file, &absolute_names)))
 		return ~ret;
 
 	switch (mode) {
@@ -343,7 +362,7 @@ int main(int argc, char * const *argv)
 		usage();
 		return 2;
 	case MODE_EXTRACT:
-		wpress_extract(file);
+		wpress_extract(file, absolute_names);
 	}
 
 	return 0;

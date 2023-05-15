@@ -153,7 +153,7 @@ int wpress_extract(modeflags_t *flags, FILE *fp_in)
 			path++;
 
 		if (flags->verbose) {
-			printf("%ld %s", hdr->size, path);
+			printf("%ld %s\n", hdr->size, path);
 		} else if (flags->list_only) {
 			puts(path);
 		}

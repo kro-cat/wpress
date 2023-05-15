@@ -12,8 +12,14 @@ AC_ARG_ENABLE(debug,
 if test "x$enable_debug" = "xyes"; then
 	AC_DEFINE([DEBUG], [], [enable debug messages])
 	AC_MSG_NOTICE([debug messages will be enabled])
-  WARN_CFLAGS="-ggdb"
+  WARN_CFLAGS="${WARN_CFLAGS:-} -ggdb"
 fi
+
+AC_ARG_ENABLE(static-libgcc,
+  [AS_HELP_STRING([--enable-static-libgcc], [Statically compile with libgcc])],
+  [CFLAGS="${CFLAGS:-} -static -static-libgcc"],
+  []
+)
 
 #host switch
 AC_CANONICAL_HOST

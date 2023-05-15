@@ -12,6 +12,7 @@ AC_ARG_ENABLE(debug,
 if test "x$enable_debug" = "xyes"; then
 	AC_DEFINE([DEBUG], [], [enable debug messages])
 	AC_MSG_NOTICE([debug messages will be enabled])
+  WARN_CFLAGS="-ggdb"
 fi
 
 #host switch
@@ -36,7 +37,7 @@ AM_CONDITIONAL([HOST_WINDOWS], [test "x${OS_VERSION}" = "xwindows"])
 
 #autoconf stuff
 AM_INIT_AUTOMAKE([subdir-objects])
-WARN_CFLAGS="-W -Wall -Wunused -Werror"
+WARN_CFLAGS="${WARN_CFLAGS} -W -Wall -Wunused -Werror"
 AC_SUBST(WARN_CFLAGS)
 AC_CONFIG_MACRO_DIRS([m4])
 #AC_CONFIG_SUBDIRS([include/lib-buffer])

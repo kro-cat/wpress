@@ -152,16 +152,17 @@ int wpress_extract(modeflags_t *flags, FILE *fp_in)
 		if ((!flags->absolute_names) && (path[0] == PATH_SEPARATOR))
 			path++;
 
-		if (flags->verbose) {
-			printf("%ld %s\n", hdr->size, path);
-		} else if (flags->list_only) {
-			puts(path);
-		}
-
 		if (!flags->list_only) {
+			if (flags->verbose)
+				puts(path);
 			if (write_file(path, hdr->size, fp_in))
 				goto die;
 		} else {
+			if (flags->verbose) {
+				printf("%ld %s\n", hdr->size, path);
+			} else {
+				puts(path);
+			}
 			/* throwaway contents */
 			while (hdr->size--)
 				fgetc(fp_in);
